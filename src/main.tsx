@@ -70,6 +70,14 @@ const translations = {
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
+  // Fix: Added body styles to ensure the main app container has the correct layout and background.
+  body: {
+    fontFamily: "'Inter', sans-serif",
+    backgroundColor: "#F0F4F8",
+    color: "#333",
+    margin: 0,
+    padding: "2rem",
+  },
   header: {
     textAlign: "center",
     marginBottom: "2rem",
@@ -736,7 +744,8 @@ const App = () => {
   }, [zoomedItem, pan, zoomLevel]);
 
   return (
-    <div>
+    // Fix: Applied the body style to the root div to ensure consistent layout.
+    <div style={styles.body}>
        <style>{`
         .image-actions {
             opacity: 0;
