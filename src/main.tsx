@@ -6,35 +6,6 @@ import './index.css';
 
 const { useState, useMemo, useRef, useEffect } = React;
 
-const ApiKeyInstructions = () => (
-    <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        padding: '2rem',
-        boxSizing: 'border-box'
-    }}>
-        <div style={{
-            textAlign: 'center',
-            backgroundColor: '#fff',
-            padding: '2rem 3rem',
-            borderRadius: '16px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-            border: '1px solid #D9534F'
-        }}>
-            <h1 style={{ color: '#D9534F', fontSize: '1.5rem' }}>Configuration Error</h1>
-            <p style={{ fontSize: '1.1rem', color: '#333' }}>
-                The <strong>VITE_API_KEY</strong> environment variable is not set.
-            </p>
-            <p style={{ fontSize: '1rem', color: '#555', marginTop: '1rem' }}>
-                Please add it to your Vercel project settings to continue.
-            </p>
-        </div>
-    </div>
-);
-
-
 const translations = {
   en: {
     title: "Outfit Matcher",
@@ -490,8 +461,6 @@ const LoadingSpinner = ({ text }) => (
 );
 
 const App = () => {
-  const apiKey = import.meta.env.VITE_API_KEY;
-
   const [language, setLanguage] = useState("id");
   
   const [generationMode, setGenerationMode] = useState("lookbook");
@@ -520,12 +489,9 @@ const App = () => {
 
   const t = translations[language];
 
-  const ai = useMemo(() => {
-    if (!apiKey) return null;
-    return new GoogleGenAI({ apiKey });
-  }, [apiKey]);
+  const ai = useMemo(() => new GoogleGenAI({ apiKey: process.env.API_KEY }), []);
 
-  const isReadyToGenerate = ai && modelImage && collection1 && collection2 && event && style && season && time;
+  const isReadyToGenerate = modelImage && collection1 && collection2 && event && style && season && time;
 
   const fileToGenerativePart = (file) => {
     return new Promise((resolve, reject) => {
@@ -768,10 +734,6 @@ const App = () => {
       };
     }
   }, [zoomedItem, pan, zoomLevel]);
-
-  if (!apiKey) {
-      return <ApiKeyInstructions />;
-  }
 
   return (
     <div>
