@@ -7,7 +7,7 @@ const { useState, useMemo, useRef, useEffect } = React;
 
 const translations = {
   en: {
-    title: "Outfit Matcher",
+    title: "Outfit Matcher AI",
     author: "by Firman Anugraha",
     selectGenerationMode: "Select Generation Mode",
     lookbook: "Lookbook",
@@ -37,7 +37,7 @@ const translations = {
     copied: "Copied!",
   },
   id: {
-    title: "Outfit Matcher",
+    title: "Outfit Matcher AI",
     author: "oleh Firman Anugraha",
     selectGenerationMode: "Pilih Mode Generasi",
     lookbook: "Lookbook",
@@ -69,24 +69,6 @@ const translations = {
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
-  body: {
-    fontFamily: "'Inter', sans-serif",
-    backgroundColor: "#F0F4F8",
-    color: "#333",
-    margin: 0,
-    padding: "2rem",
-  },
-  header: {
-    textAlign: "center",
-    marginBottom: "2rem",
-    position: "relative",
-  },
-  title: {
-    fontSize: "2.5rem",
-    fontWeight: 700,
-    color: "#2A4B7C",
-    margin: 0,
-  },
   author: {
     fontSize: "1rem",
     color: "#555",
@@ -113,30 +95,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: "#2A4B7C",
     color: "#FFF",
   },
-  mainContainer: {
-    display: "flex",
-    gap: "2rem",
-    alignItems: 'flex-start',
-  },
-  leftPanel: {
-    background: "#2A4B7C",
-    padding: "2rem",
-    borderRadius: "16px",
-    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-    flex: "1 1 400px",
-    maxWidth: "450px",
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.5rem',
-  },
-  rightPanel: {
-    flex: "2 1 800px",
-    background: '#FFFFFF',
-    padding: '2rem',
-    borderRadius: '16px',
-    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
-    minHeight: '600px',
-  },
   section: {
     width: '100%',
     color: 'white',
@@ -148,16 +106,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginBottom: "1rem",
     paddingBottom: "0.5rem",
     borderBottom: '1px solid #4A6A9C'
-  },
-  uploadGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "1rem",
-  },
-  customizeGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "1rem",
   },
   selectLabel: {
     display: "block",
@@ -238,11 +186,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#2A4B7C',
     fontWeight: 700,
   },
-  generatedImagesGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '1rem',
-  },
   imageContainer: {
     position: 'relative',
     borderRadius: '12px',
@@ -275,14 +218,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: '600',
     fontSize: '1rem',
     backdropFilter: 'blur(5px)',
-    transition: 'background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease',
+    transition: 'background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
     width: '180px',
     textAlign: 'center',
-  },
-  overlayActionButton: {
-    background: 'rgba(20, 20, 20, 0.8)',
-    color: 'white',
-    border: '1px solid rgba(255, 255, 255, 0.7)',
+    transform: 'scale(1)',
   },
   generatedImageOverlay: {
     position: 'absolute',
@@ -495,9 +434,13 @@ const App = () => {
 
   const t = translations[language];
 
-  const ai = useMemo(() => new GoogleGenAI({ apiKey: process.env.API_KEY }), []);
+  // State untuk menyimpan API Key dari input pengguna
+  const [apiKey, setApiKey] = useState('');
 
-  const isReadyToGenerate = modelImage && collection1 && collection2 && event && style && season && time;
+  // `useMemo` akan dijalankan kembali HANYA JIKA `apiKey` berubah
+  const ai = useMemo(() => apiKey ? new GoogleGenAI({ apiKey }) : null, [apiKey]);
+
+  const isReadyToGenerate = modelImage && collection1 && collection2 && event && style && season && time && ai;
 
   const fileToGenerativePart = (file) => {
     return new Promise((resolve, reject) => {
@@ -742,7 +685,7 @@ const App = () => {
   }, [zoomedItem, pan, zoomLevel]);
 
   return (
-    <div style={styles.body}>
+    <div className="app-body">
        <style>{`
         .image-actions {
             opacity: 0;
@@ -758,21 +701,125 @@ const App = () => {
         .image-container:hover .generated-image-overlay {
             opacity: 1;
         }
-        .overlay-action-button {
-            background: rgba(20, 20, 20, 0.8) !important;
-            color: white !important;
-            border-color: rgba(255, 255, 255, 0.7) !important;
+        .secondary-action-button {
+            background: rgba(20, 20, 20, 0.8);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.7);
         }
-        .overlay-action-button:hover {
-            background-color: rgba(255, 255, 255, 0.9) !important;
-            color: #222 !important;
-            border-color: transparent !important;
+        .secondary-action-button:hover {
+            background-color: rgba(255, 255, 255, 1);
+            color: #222;
+            border-color: transparent;
+            transform: scale(1.05);
         }
         .modal-action-button:hover, .modal-zoom-button:hover {
             background-color: #ced4da;
         }
+        
+        /* Base Layout Styles */
+        .app-body {
+          font-family: 'Inter', sans-serif;
+          background-color: #F0F4F8;
+          color: #333;
+          margin: 0;
+          padding: 2rem;
+        }
+        
+        .app-header {
+          text-align: center;
+          margin-bottom: 2rem;
+          position: relative;
+        }
+        
+        .app-title {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #2A4B7C;
+          margin: 0;
+        }
+        
+        .main-container {
+          display: flex;
+          gap: 2rem;
+          align-items: flex-start;
+        }
+        
+        .left-panel {
+          background: #2A4B7C;
+          padding: 2rem;
+          border-radius: 16px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+          flex: 1 1 400px;
+          max-width: 450px;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+        
+        .right-panel {
+          flex: 2 1 800px;
+          background: #FFFFFF;
+          padding: 2rem;
+          border-radius: 16px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+          min-height: 600px;
+        }
+        
+        .upload-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+        
+        .customize-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+        
+        .generated-images-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        /* Responsive Overrides for Mobile */
+        @media (max-width: 900px) {
+          .app-body {
+            padding: 1rem;
+          }
+          .app-header {
+            margin-bottom: 1.5rem;
+          }
+          .app-title {
+            font-size: 1.8rem;
+          }
+          .main-container {
+            flex-direction: column;
+            gap: 1.5rem;
+          }
+          .left-panel {
+            max-width: 100%;
+            padding: 1.5rem;
+            width: 100%;
+            box-sizing: border-box;
+          }
+          .right-panel {
+            padding: 1rem;
+            min-height: auto;
+            width: 100%;
+            box-sizing: border-box;
+          }
+          .generated-images-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+          }
+          .upload-grid, .customize-grid {
+            grid-template-columns: 1fr;
+          }
+        }
     `}</style>
-      <header style={styles.header}>
+      <header className="app-header">
         <div style={styles.languageSwitcher}>
           <button
             style={{ ...styles.langButton, ...(language === "en" ? styles.langButtonActive : {}) }}
@@ -781,12 +828,12 @@ const App = () => {
             style={{ ...styles.langButton, ...(language === "id" ? styles.langButtonActive : {}) }}
             onClick={() => setLanguage("id")} >ID</button>
         </div>
-        <h1 style={styles.title}>{t.title}</h1>
+        <h1 className="app-title">{t.title}</h1>
         <p style={styles.author}>{t.author}</p>
       </header>
 
-      <main style={styles.mainContainer}>
-        <div style={styles.leftPanel}>
+      <main className="main-container">
+        <div className="left-panel">
 
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>{t.selectGenerationMode}</h2>
@@ -803,8 +850,16 @@ const App = () => {
           </div>
           
           <div style={styles.section}>
+            <h2 style={styles.sectionTitle}>Your API Key</h2>
+            <input
+              type="password"
+              placeholder="Masukkan Google AI API Key Anda"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #4A6A9C', backgroundColor: '#3E5C8A', color: 'white' }}
+            />
             <h2 style={styles.sectionTitle}>{t.uploadYourCollection}</h2>
-            <div style={styles.uploadGrid}>
+            <div className="upload-grid">
               <ImageUploader title={`${t.uploadPhoto} 1`} onImageChange={setCollection1} />
               <ImageUploader title={`${t.uploadPhoto} 2`} onImageChange={setCollection2} />
             </div>
@@ -812,7 +867,7 @@ const App = () => {
           
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>{t.customize}</h2>
-            <div style={styles.customizeGrid}>
+            <div className="customize-grid">
               <div>
                 <label style={styles.selectLabel}>{t.event}</label>
                 <select style={styles.select} value={event} onChange={(e) => setEvent(e.target.value)}>
@@ -865,33 +920,33 @@ const App = () => {
           </button>
 
         </div>
-        <div style={styles.rightPanel}>
+        <div className="right-panel">
           {loading && <LoadingSpinner text={t.generating}/>}
           {error && <p style={styles.errorMessage}>{error}</p>}
           {!loading && !error && (
             <>
               {generatedImages.length > 0 && (
-                <div style={styles.generatedImagesGrid}>
+                <div className="generated-images-grid">
                   {generatedImages.map((image, index) => (
                     <div key={index} className="image-container" style={styles.imageContainer} >
                        <img src={image.src} alt={`Generated Look ${index + 1}`} style={styles.generatedImage} />
                        <div className="generated-image-overlay" style={styles.generatedImageOverlay}></div>
                        <div className="image-actions" style={styles.imageActions}>
                            <button 
-                                className="overlay-action-button"
-                                style={{ ...styles.actionButton, ...styles.overlayActionButton }} 
+                                className="secondary-action-button"
+                                style={styles.actionButton} 
                                 onClick={(e) => { e.stopPropagation(); handleOverlayCopy(image.prompt, index); }}>
                                {copiedPromptIndex === index ? t.copied : t.copyPrompt}
                            </button>
                            <button 
-                                className="overlay-action-button"
-                                style={{ ...styles.actionButton, ...styles.overlayActionButton }}
+                                className="secondary-action-button"
+                                style={styles.actionButton}
                                 onClick={(e) => { e.stopPropagation(); openZoomModal(image); }}>
                                {t.zoom}
                            </button>
                            <button 
-                                className="overlay-action-button"
-                                style={{ ...styles.actionButton, ...styles.overlayActionButton }}
+                                className="secondary-action-button"
+                                style={styles.actionButton}
                                 onClick={(e) => { e.stopPropagation(); handleDownload(image.src, `stylook-outfit-${index + 1}.png`); }}>
                                {t.download}
                            </button>
